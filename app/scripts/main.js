@@ -2,6 +2,8 @@
 
 // TODO filtering
 // - concept of secondary details
+// - show only dream connector edges, edges with a node that has > 1 occurance
+// - be able to highlight dreams
 
 var d3 = window.d3;
 
@@ -18,7 +20,7 @@ var force = d3.layout.force()
     .friction(0.5)
     .charge(-100)
     .chargeDistance(500)
-    .gravity(0.01)
+    .gravity(0.05)
     .size([width, height]);
 
 var color = d3.scale.category20();
