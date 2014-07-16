@@ -3,7 +3,7 @@
 // TODO filtering
 // - concept of secondary details
 // - show only dream connector edges, edges with a node that has > 1 occurance
-// - be able to highlight dreams
+// - secondary view in which dreams are the nodes and the edges between them are shared keywords
 
 var d3 = window.d3;
 
@@ -15,10 +15,10 @@ var svg = d3.select('body').append('svg')
     .attr('height', height);
 
 var force = d3.layout.force()
-    //.linkDistance(100)
+    .linkDistance(100)
     .linkStrength(0.1) // more elastic links
     .friction(0.5)
-    .charge(-100)
+    .charge(-200)
     .chargeDistance(500)
     .gravity(0.05)
     .size([width, height]);
@@ -38,7 +38,6 @@ var edges = [];
  * Data Parsing
  *********************************************************/
 
-// TODO deal with multiple dates for a keyword
 var parseDreamsForKeywords = function(dreamObjectArray) {
     var keywordObjs = [];
     dreamObjectArray.forEach( function(dream) {
@@ -103,6 +102,34 @@ var nodeSize = function(d) {
     return d.occurances * 10;
 };
 
+var highlightNeighbors = function(clickedNode) {
+    //svg.selectAll('.node').forEach ( function(keyword) {
+        //console.log(keyword);
+        //keyword.dates.forEach ( function(date1) {
+            //clickedNode.dates.forEach ( function (date2) {
+                //if (date1 === date2) {
+                    //console.log(keyword);
+                //}
+            //});
+        //});
+    //});
+    svg.selectAll('.node').style('fill', function(d) {
+        var isNeighbor = false;
+        d.dates.forEach( function(date1) {
+            clickedNode.dates.forEach( function(date2) {
+                if (date1 === date2) {
+                    isNeighbor = true;
+                }
+            });
+        });
+        if (isNeighbor) {
+            return '#000000';
+        } else {
+            return color(d.group);
+        }
+    });
+};
+
 /*********************************************************
  * Render Graph
  *********************************************************/
@@ -129,6 +156,7 @@ d3.json('dreams.json', function(error, dreams) {
         .style('fill', function(d) { return color(d.group); })
         .on('click', function (d) {
             $('h1').html(d.keyword);
+            highlightNeighbors(d);
         })
         .call(force.drag);
 
