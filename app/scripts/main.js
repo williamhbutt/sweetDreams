@@ -11,6 +11,7 @@ var width = 960,
     height = 500;
 
 var svg = d3.select('body').append('svg')
+    .attr('class', 'canvas')
     .attr('width', width)
     .attr('height', height);
 
@@ -32,6 +33,8 @@ var keywords = [];
 // edges Array:
 // array of obkects {source, target}
 var edges = [];
+
+var dateList = [];
 
 
 /*********************************************************
@@ -102,6 +105,14 @@ var nodeSize = function(d) {
     return d.occurances * 10;
 };
 
+var parseDreamsForDates = function(dreams) {
+    console.log(dreams);
+    var tempDateArray = [];
+    dreams.forEach(function(dream) {
+        $('select').append('<option value="'+dream.date+'">'+dream.date+'</option');
+    });
+};
+
 var highlightNeighbors = function(clickedNode) {
     //svg.selectAll('.node').forEach ( function(keyword) {
         //console.log(keyword);
@@ -122,6 +133,9 @@ var highlightNeighbors = function(clickedNode) {
                 }
             });
         });
+        if (d.keyword === clickedNode.keyword) {
+            return '#FFD700';
+        }
         if (isNeighbor) {
             return '#000000';
         } else {
@@ -137,6 +151,7 @@ var highlightNeighbors = function(clickedNode) {
 d3.json('dreams.json', function(error, dreams) {
     keywords = parseDreamsForKeywords(dreams);
     edges = parseDreamsForEdges(keywords);
+    dateList = parseDreamsForDates(dreams);
 
     force
         .nodes(keywords)
@@ -155,7 +170,7 @@ d3.json('dreams.json', function(error, dreams) {
         .attr('r', nodeSize)
         .style('fill', function(d) { return color(d.group); })
         .on('click', function (d) {
-            $('h1').html(d.keyword);
+            $('h2').html('Selected keyword: ' + d.keyword + ' occurs in ' + d.occurances + ' dream(s)');
             highlightNeighbors(d);
         })
         .call(force.drag);
@@ -171,5 +186,27 @@ d3.json('dreams.json', function(error, dreams) {
 
         node.attr('cx', function(d) { return d.x; })
             .attr('cy', function(d) { return d.y; });
+    });
+
+    $('select').change(function() {
+        var selectedDate = $( 'select option:selected' ).val();
+        if (selectedDate === 'all') {
+            $('.node').show();
+            $('.link').show();
+        } else {
+            svg.selectAll('.node').style('display', function(d) {
+                var sameDate = false;
+                d.dates.forEach(function(date1) {
+                    if(date1 == selectedDate) {
+                        sameDate = true;
+                    }
+                });
+                if (sameDate) {
+                    return 'block';
+                } else {
+                    return 'none';
+                }
+            });
+        }
     });
 });

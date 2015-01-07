@@ -13,3 +13,20 @@ body {
   stroke: #000;
   stroke-opacity: .6;
 }
+.canvas {
+    margin: 0 auto;
+    display: block;
+    border: 1px solid;
+}
+
+h1 {
+    text-align: center;
+}
+h2, h3 {
+    text-align: center;
+}
+select {
+    display: block;
+    margin: 10px auto;
+}
+
